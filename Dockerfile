@@ -30,7 +30,7 @@ RUN apt-get update \
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Copy Composer files first so dependency installation can be cached
-COPY composer.json composer.lock ./
+COPY composer.json ./
 
 RUN composer install \
         --no-dev \
