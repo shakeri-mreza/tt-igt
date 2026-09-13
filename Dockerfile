@@ -29,13 +29,17 @@ RUN apt-get update \
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-COPY . /var/www/html
+# Copy Composer files first so dependency installation can be cached
+COPY composer.json composer.lock ./
 
 RUN composer install \
         --no-dev \
         --prefer-dist \
         --no-interaction \
         --optimize-autoloader
+
+# Copy application source after Composer
+COPY . /var/www/html
 
 RUN mkdir -p \
         storage/framework/cache \
@@ -50,8 +54,6 @@ RUN chown -R www-data:www-data \
 
 COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
 
-RUN a2ensite 000-default.conf
-
-EXPOSE 10000
+EXPOSE 80
 
 CMD ["apache2-foreground"]
